@@ -15,4 +15,6 @@ object Credentials {
   ).mkString.trim
 
   lazy val ApiKey = Source.fromFile(new File(HomeDir, "api_key")).mkString.trim
+
+  lazy val Frob = Source.fromFile(new File(HomeDir, "frob")).mkString.trim
 }

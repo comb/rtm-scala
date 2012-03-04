@@ -1,12 +1,14 @@
 package net.combinatory.rtm
 
 sealed trait Method {
-  final val name = "rtm." + suffix
+  final lazy val name = "rtm." + suffix
+  lazy val requiresSignature = true
   protected[this] val suffix: String
 }
 
 case object TestEcho extends Method {
   override protected[this] val suffix = "test.echo"
+  override lazy val requiresSignature = false
 }
 // case object TestLogin extends Method {
 //   override protected[this] val suffix = "test.login"

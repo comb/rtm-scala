@@ -3,7 +3,7 @@ package net.combinatory.rtm
 import org.joda.time.DateTime
 
 case class TaskSeries(
-  val id: Long,
+  val id: String,
   val created: DateTime,
   val modified: DateTime,
   val name: String,
@@ -13,7 +13,7 @@ case class TaskSeries(
 )
 
 case class Task(
-  val id: Long,
+  val id: String,
   val due: Option[DateTime],
   val hasDueTime: Boolean,
   val added: DateTime,

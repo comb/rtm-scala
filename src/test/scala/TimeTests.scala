@@ -10,6 +10,6 @@ class TimeTests extends FunSuite {
   }
 
   test("echo") {
-    Http runMethod (Echo, Nil)
+    Http runMethod (TestEcho, Nil)
   }
 }
