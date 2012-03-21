@@ -5,6 +5,7 @@ import org.joda.time.format.ISODateTimeFormat
 object Rtm {
 
   def RestBase = "https://api.rememberthemilk.com/services/rest/"
+  def AuthBase = "https://www.rememberthemilk.com/services/auth/"
   def TestMethod = "rtm.test.echo"
 
   def Encoding = "utf-8"
