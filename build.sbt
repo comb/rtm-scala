@@ -12,11 +12,14 @@ scalacOptions ++= Seq("-deprecation", "-unchecked")
 
 javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
+resolvers += "Spray repo" at "http://repo.spray.cc/"
+
 //SCALA DEPENDENCIES
 libraryDependencies ++= Seq (
   "org.scalatest" %% "scalatest" % "1.7.1" % "test",
   "joda-time" % "joda-time" % "2.1",
-  "org.joda" % "joda-convert" % "1.1"
+  "org.joda" % "joda-convert" % "1.1",
+  "cc.spray" %%  "spray-json" % "1.1.1"
 )
 
 //SBT BEHAVIOR
