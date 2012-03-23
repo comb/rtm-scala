@@ -30,7 +30,7 @@ object Invoke {
    * @return
    */
   def getFrob = {
-    Frob.fromJson(Http.runMethod (Methods.getFrob).asJson)
+    Frob.fromJson(Http.runMethod (Methods.getFrob))
   }
   
   def getToken(frob:Frob) = {
@@ -39,7 +39,7 @@ object Invoke {
       ("perms", "read") ::
       Nil
     }
-    Auth.fromJson(Http.runMethod(Methods.getToken, allParams).asJson)
+    Auth.fromJson(Http.runMethod(Methods.getToken, allParams))
   }
 
   def getTasks(token:String) = {

@@ -1,7 +1,7 @@
 package net.combinatory.rtm
 
 import net.combinatory.rtm.Responses.ResponseBuilder
-import cc.spray.json.{DefaultJsonProtocol, JsonFormat, JsValue, RootJsonFormat}
+import cc.spray.json._
 
 
 abstract class RtmException(msg: String, code: Option[Int])
@@ -12,7 +12,7 @@ case class InvalidAuth(msg: String) extends RtmException(msg, Some(98))
 case class UnspecifiedException(msg: String, code: Option[Int])
   extends RtmException(msg, code)
 
-// {"rsp":{"stat":"ok","frob":"c99a45788cbff185e75a009fe5d378ae59272afb"}}
+
 
 /*case class Response[T](rsp:T)
 object Response {
@@ -21,6 +21,8 @@ object Response {
   }
 }*/
 object Responses {
+  import DefaultJsonProtocol._ // necessary for some implicit resolutions
+
   type RSP[T] = Either[RtmException, T]
   type FrobType = String
 
@@ -28,53 +30,66 @@ object Responses {
    * Class responsible for extracting as Response and it's contents. The contents are the domain objects.
    * @tparam T The domain object to be extracted.
    */
-  class ResponseBuilder[T : JsonFormat](dataField:Option[String]=None) {
-    case class Response(rsp:RSP[T])
+  class ResponseBuilder[T: JsonFormat](dataField: Option[String] = None) {
+    println("Creating response builder: "+dataField)
+    case class Response(rsp: RSP[T])
+
     object Response {
+
       implicit object ResponseJsonFormat extends RootJsonFormat[Response] {
         def write(obj: Response) = null
 
         def read(json: JsValue) = {
-          val contents = json.asJsObject.getFields("rsp")(0) // TODO handle exceptions here
-          import DefaultJsonProtocol._
+          val contents = json.asJsObject.getFields("rsp")(0) // TODO handle exceptions
           val stat = contents.asJsObject.getFields("stat")(0).convertTo[String]
           val jsonObject = dataField match {
             case Some(field) => contents.asJsObject.getFields(field)(0)
             case None => contents
-          } 
+          }
           println(jsonObject.prettyPrint)
           Response(
-            Either.cond(stat=="ok",
+            Either.cond(stat == "ok",
               jsonObject.convertTo[T],
-              new RtmException(contents.toString,None) {} // TODO take the err code or use the Exceptions classes
+              new RtmException(contents.toString, None) {} // TODO take the err code or use the Exceptions classes
+              // we also have format for exceptions
             )
           )
 
         }
       }
+
     }
-  }
-  case class Frob(frob:FrobType)
-  object Frob { // should this object extend ResponseBuilder?
-    import DefaultJsonProtocol._ // TODO this entire block can be easily abstracted out
-    implicit val format:RootJsonFormat[Frob] = jsonFormat1(Frob.apply)
-    implicit val responseBuilder=new ResponseBuilder[Frob]()
-    
-    def fromJson(json:JsValue): RSP[Frob] = {
-      json.convertTo[responseBuilder.Response].rsp
-    }
+
   }
 
-  case class Auth(token: String, perms: String)
-  object Auth { // TODO this entire block can be easily abstracted out
-    // should this object extend ResponseBuilder?
-    import DefaultJsonProtocol._
+  trait AbstractDomainExtractor[T] {
 
-    implicit val format: RootJsonFormat[Auth] = jsonFormat2(Auth.apply)
-    implicit val responseBuilder = new ResponseBuilder[Auth](Option("auth"))
+    implicit val format: RootJsonFormat[T]
+    implicit lazy val responseFormat:ResponseBuilder[T] = new ResponseBuilder[T]()
 
-    def fromJson(json: JsValue): RSP[Auth] = {
-      json.convertTo[responseBuilder.Response].rsp
+    def fromJson(json: JsValue): RSP[T] = {
+      json.convertTo[responseFormat.Response].rsp // TODO deal with parsing exceptions
     }
+
+    def fromJson(jsonString: String): RSP[T] = {
+      jsonString.asJson.convertTo[responseFormat.Response].rsp // TODO deal with parsing exceptions
+    }
+  }
+
+  case class Frob(frob: FrobType)
+  object Frob extends AbstractDomainExtractor[Frob] {
+    implicit override lazy val responseFormat:ResponseBuilder[Frob] = new ResponseBuilder[Frob]()
+    implicit val format: RootJsonFormat[Frob] = jsonFormat1(Frob.apply)
+  }
+
+  case class User(id: String, username: String, fullname: String)
+  object User extends AbstractDomainExtractor[User] {
+    implicit val format: RootJsonFormat[User] = DefaultJsonProtocol.jsonFormat3(User.apply)
+  }
+
+  case class Auth(token: String, perms: String, user: User)
+  object Auth extends AbstractDomainExtractor[Auth] {    println("Creating auth")
+    implicit override lazy val responseFormat:ResponseBuilder[Auth] = new ResponseBuilder[Auth](Option("auth"))
+    implicit val format: RootJsonFormat[Auth] = DefaultJsonProtocol.jsonFormat3(Auth.apply)
   }
 }

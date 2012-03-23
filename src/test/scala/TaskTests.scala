@@ -6,6 +6,6 @@ class TaskTests extends FunSuite {
 
   test("tasks") {
     //pending
-    Http runMethod (Methods.tasksGetList, Nil)
+    Http runMethod (Methods.taskGetList, Nil)
   }
 }
