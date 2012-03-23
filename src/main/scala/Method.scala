@@ -10,7 +10,10 @@ object Methods {
   val getFrob = SignedMethod("auth.getFrob")
   val authMe = AuthMethod("") // url the user has to login to. how to deal with this?
   val getToken = SignedMethod("auth.getToken", "perms" -> false :: "frob" -> false :: Nil)
-  
+
+  val getMethods = UnsignedMethod("reflection.getMethods")
+  val getMethodInfo = UnsignedMethod("reflection.getMethodInfo","method_name"->true :: Nil)
+
   object Method {
     class PimpedMethod(x: Method) {
       // pimps go here

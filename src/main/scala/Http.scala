@@ -6,7 +6,9 @@ import javax.net.ssl.HttpsURLConnection
 import scala.io.Source
 
 object Invoke {
-
+  import Responses._
+  import cc.spray.json._
+  
   /** Right represents the data from node we are interested in.
    *  Left is failure with the fail message"
    *   A sample error response:
@@ -15,26 +17,29 @@ object Invoke {
    *     </rsp>
    */
   def extractNode(response:String,nodeName:String):Either[String, String] = {
-    println("Response: " + response)
+    //println("Response: " + response)
     val xml = scala.xml.XML.loadString(response)
     val stat = xml \\ "rsp" \\ "@stat" toString;
     if (stat == "ok") Right((xml \\ "rsp" \\ nodeName).text)
     else Left(stat +" - "+ (xml \\ "rsp" \\ "err" \\ "@msg" toString)) // TODO add the err code
   }
-  
+
+
+  /**
+   *
+   * @return
+   */
   def getFrob = {
-    val response = Http.runMethod (Methods.getFrob,Nil)
-    extractNode(response,"frob")
+    Frob.fromJson(Http.runMethod (Methods.getFrob).asJson)
   }
   
-  def getToken(frob:String) = {
+  def getToken(frob:Frob) = {
     val allParams = {
-      ("frob", frob) ::
+      ("frob", frob.frob) :: // this feels ridiculous
       ("perms", "read") ::
       Nil
     }
-    val response = Http.runMethod(Methods.getToken, allParams)
-    extractNode(response, "token")
+    Auth.fromJson(Http.runMethod(Methods.getToken, allParams).asJson)
   }
 
   def getTasks(token:String) = {
@@ -48,7 +53,7 @@ object Http {
 
   import Methods.Method
   
-  def runMethod(method: Method, params: List[KV]):String={
+  def runMethod(method: Method, params: List[KV]=Nil):String={
     val url = this mkApiUrl (method, params)
     val body = this doGet url
     println("BODY")
@@ -71,11 +76,11 @@ object Http {
     }
   }
 
-  /*private[this]*/ def mkApiUrl(method: Method, params: List[KV]) = {
+  /*private[this]*/ def mkApiUrl(method: Method, params: List[KV]=Nil) = {
     val allParams = {
       ("method", method.name) ::
       ("api_key", Credentials.ApiKey) ::
-      ("response", "json") ::
+      ("format", "json") ::
       params
     }
     val finParams = if (method.signed) this signParams allParams
