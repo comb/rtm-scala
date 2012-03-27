@@ -78,7 +78,8 @@ object Responses {
 
   case class Frob(frob: FrobType)
   object Frob extends AbstractDomainExtractor[Frob] {
-    implicit override lazy val responseFormat:ResponseBuilder[Frob] = new ResponseBuilder[Frob]()
+    implicit override lazy val responseFormat:ResponseBuilder[Frob] =
+      new ResponseBuilder[Frob]()
     implicit val format: RootJsonFormat[Frob] = jsonFormat1(Frob.apply)
   }
 

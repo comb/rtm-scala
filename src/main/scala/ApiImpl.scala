@@ -2,10 +2,13 @@ package net.combinatory.rtm
 
 import org.joda.time.DateTime
 
-/* Implementation of the read-only api. */
-trait RtmReadOnlyApiImpl {
+import Responses.{ Frob, RSP }
+import Requests.ApiToken
 
-  def authGetFrob(): Unit = throw new UnsupportedOperationException
+/* Implementation of the read-only api. */
+class RtmReadOnlyApiImpl(token: ApiToken) {
+
+  def authGetFrob(): RSP[Frob] = Frob fromJson (Rtm runMethod Methods.getFrob)
   def authGetToken(frob: String): Unit =
     throw new UnsupportedOperationException
   def contactsGetList(): Unit = throw new UnsupportedOperationException

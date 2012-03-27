@@ -22,7 +22,7 @@ object Invoke {
     else Left(stat +" - "+ (xml \\ "rsp" \\ "err" \\ "@msg" toString))
   }
 
-  def getFrob = Frob.fromJson(Http.runMethod (Methods.getFrob))
+  def getFrob = 
   
   def getToken(frob: Frob) = {
     val allParams = {
