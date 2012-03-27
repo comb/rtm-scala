@@ -9,18 +9,13 @@ object Methods {
     "auth.getToken",
     "perms" -> false :: "frob" -> false :: Nil
   )
-
-
-  val testEcho = UnsignedMethod("test.echo")
-
-  val taskGetList = SignedMethod("tasks.getList",
-    "list_id" -> true :: "filter" -> true :: "last_sync" -> true :: Nil)
-
-  //url the user has to login to. how to deal with this?
-  val authMe = AuthMethod("") 
-
-  val getMethods = UnsignedMethod("reflection.getMethods")
-  val getMethodInfo = UnsignedMethod(
+  val TestEcho = UnsignedMethod("test.echo")
+  val TaskGetList = SignedMethod(
+    "tasks.getList",
+    "list_id" -> true :: "filter" -> true :: "last_sync" -> true :: Nil
+  )
+  val GetMethods = UnsignedMethod("reflection.getMethods")
+  val GetMethodInfo = UnsignedMethod(
     "reflection.getMethodInfo",
     "method_name" -> true :: Nil
   )
@@ -54,25 +49,6 @@ object Methods {
   // Not sure this is useful
   case class AuthMethod(
     override val suffix: String,
-    override val arguments: Arguments = Nil) extends Method
-
-
-  /*case object TestEcho extends Method {
-    override private[this] val suffix = "test.echo"
-    override lazy val signed = false
-  }*/
-
-  // case object TestLogin extends Method {
-  //   override protected[this] val suffix = "test.login"
-  // }
-  // case object GroupsGetList extends Method {
-  //   override protected[this] val suffix = "groups.getList"
-  // }
-  // case object ListsGetList extends Method {
-  //   override protected[this] val suffix = "lists.getList"
-  // }
-  /*case object TasksGetList extends Method {
-    override private[this] val suffix = "tasks.getList"
-    override val arguments = "list_id" -> true :: "filter" -> true :: "last_sync" -> true :: Nil
-  }*/
+    override val arguments: Arguments = Nil
+  ) extends Method
 }

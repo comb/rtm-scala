@@ -22,11 +22,6 @@ object Invoke {
     else Left(stat +" - "+ (xml \\ "rsp" \\ "err" \\ "@msg" toString))
   }
 
-  def getFrob = 
-  
-  def getToken(frob: Frob) = {
-  }
-
   def getTasks(token: String) = {
     val allParams = ("auth_token", token) :: Nil
     Http runMethod (Methods.taskGetList, allParams)
