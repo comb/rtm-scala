@@ -8,7 +8,7 @@ import Requests.ApiToken
 /* Implementation of the read-only api. */
 class RtmReadOnlyApiImpl(token: ApiToken) {
 
-  def authGetFrob(): RSP[Frob] = Frob fromJson (Rtm runMethod Methods.getFrob)
+  def authGetFrob(): RSP[Frob] = Frob fromJson (Rtm runMethod Methods.GetFrob)
   def authGetToken(frob: String): Unit =
     throw new UnsupportedOperationException
   def contactsGetList(): Unit = throw new UnsupportedOperationException

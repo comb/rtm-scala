@@ -4,11 +4,13 @@ object Methods {
 
   type Arguments = Seq[(String, Boolean)]
 
+  val GetFrob = SignedMethod("auth.getFrob")
+
+
   val testEcho = UnsignedMethod("test.echo")
 
   val taskGetList = SignedMethod("tasks.getList",
     "list_id" -> true :: "filter" -> true :: "last_sync" -> true :: Nil)
-  val getFrob = SignedMethod("auth.getFrob")
 
   //url the user has to login to. how to deal with this?
   val authMe = AuthMethod("") 
