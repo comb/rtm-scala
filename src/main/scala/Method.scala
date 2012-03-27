@@ -5,6 +5,10 @@ object Methods {
   type Arguments = Seq[(String, Boolean)]
 
   val GetFrob = SignedMethod("auth.getFrob")
+  val GetToken = SignedMethod(
+    "auth.getToken",
+    "perms" -> false :: "frob" -> false :: Nil
+  )
 
 
   val testEcho = UnsignedMethod("test.echo")
@@ -14,10 +18,6 @@ object Methods {
 
   //url the user has to login to. how to deal with this?
   val authMe = AuthMethod("") 
-  val getToken = SignedMethod(
-    "auth.getToken",
-    "perms" -> false :: "frob" -> false :: Nil
-  )
 
   val getMethods = UnsignedMethod("reflection.getMethods")
   val getMethodInfo = UnsignedMethod(

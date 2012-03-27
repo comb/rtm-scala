@@ -25,12 +25,6 @@ object Invoke {
   def getFrob = 
   
   def getToken(frob: Frob) = {
-    val allParams = {
-      ("frob", frob.frob) :: // this feels ridiculous
-      ("perms", "read") ::
-      Nil
-    }
-    Auth fromJson Http.runMethod(Methods.getToken, allParams)
   }
 
   def getTasks(token: String) = {
