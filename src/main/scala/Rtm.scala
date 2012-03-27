@@ -16,15 +16,17 @@ object Rtm {
   def SigKey = "api_sig"
   def MethodKey = "method"
 
-  def runMethod(method: Method, params: List[KV]=Nil):String={
+  object DefaultHttpParams extends HttpParams(60000, 6000)
+
+  def runMethod(method: Method, params: List[KV] = Nil): String = {
     val url = this mkApiUrl (method, params)
-    val body = Http doGet url
+    val body = new Http(DefaultHttpParams) doGet url
     println("BODY")
     println(body)
     body
   }
 
-  private[this] def mkApiUrl(method: Method, params: List[KV]=Nil) = {
+  private[this] def mkApiUrl(method: Method, params: List[KV] = Nil) = {
     val allParams = {
       ("method", method.name) ::
       ("api_key", Credentials.ApiKey) ::

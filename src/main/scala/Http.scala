@@ -7,16 +7,21 @@ import scala.io.Source
 
 import Methods.Method
 
-object Http {
+case class HttpParams(
+  val readTimeoutMillis: Int,
+  val connectionTimeoutMillis: Int
+)
 
-  private[this] val ConnectionTimeout = 10000
-  private[this] val ReadTimeout = 100000
+class Http(params: HttpParams) {
+
+  // private[this] val ConnectionTimeout = 10000
+  // private[this] val ReadTimeout = 100000
 
   def doGet(url: URL): String = {
     println("DO GET ON:" + url)
     val con = (url openConnection()).asInstanceOf[HttpsURLConnection]
-    con setConnectTimeout ConnectionTimeout
-    con setReadTimeout ReadTimeout
+    con setConnectTimeout params.connectionTimeoutMillis
+    con setReadTimeout params.readTimeoutMillis
     con setRequestMethod "GET"
     val in = con.getInputStream 
     try {
