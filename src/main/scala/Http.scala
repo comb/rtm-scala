@@ -5,88 +5,32 @@ import javax.net.ssl.HttpsURLConnection
 
 import scala.io.Source
 
-object Invoke {
-  import Responses._
-  import cc.spray.json._
-  
-  /** Right represents the data from node we are interested in.
-   *  Left is failure with the fail message"
-   *   A sample error response:
-   *     <rsp stat="fail">
-   *       <err msg="Invalid frob - did you authenticate?" code="101"></err>
-   *     </rsp>
-   */
-  def extractNode(response:String,nodeName:String):Either[String, String] = {
-    //println("Response: " + response)
-    val xml = scala.xml.XML.loadString(response)
-    val stat = xml \\ "rsp" \\ "@stat" toString;
-    if (stat == "ok") Right((xml \\ "rsp" \\ nodeName).text)
-    else Left(stat +" - "+ (xml \\ "rsp" \\ "err" \\ "@msg" toString)) // TODO add the err code
-  }
-
-
-  /**
-   *
-   * @return
-   */
-  def getFrob = {
-    Frob.fromJson(Http.runMethod (Methods.getFrob))
-  }
-  
-  def getToken(frob:Frob) = {
-    val allParams = {
-      ("frob", frob.frob) :: // this feels ridiculous
-      ("perms", "read") ::
-      Nil
-    }
-    Auth.fromJson(Http.runMethod(Methods.getToken, allParams))
-  }
-
-  def getTasks(token:String) = {
-    val allParams = ("auth_token", token) :: Nil
-    Http.runMethod(Methods.taskGetList, allParams)
-  }
-
-}
+import Methods.Method
 
 object Http {
 
-  import Methods.Method
-  
-  def runMethod(method: Method, params: List[KV]=Nil):String={
-    val url = this mkApiUrl (method, params)
-    val body = this doGet url
-    println("BODY")
-    println(body)
-    body
-  }
+  private[this] val ConnectionTimeout = 10000
+  private[this] val ReadTimeout = 100000
 
-  /*private[this]*/ def doGet(url: URL): String = {
+  def doGet(url: URL): String = {
     println("DO GET ON:" + url)
     val con = (url openConnection()).asInstanceOf[HttpsURLConnection]
-    // con setConnectTimeout ?
-    // con setReadTimeout ?
+    con setConnectTimeout ConnectionTimeout
+    con setReadTimeout ReadTimeout
     con setRequestMethod "GET"
+    val in = con.getInputStream 
     try {
       con connect()
-      Source.fromInputStream(con.getInputStream).mkString // TODO does this input stream get closed?
+      Source.fromInputStream(in).mkString
     }
     finally {
+      in close()
       con disconnect()
     }
   }
 
-  /*private[this]*/ def mkApiUrl(method: Method, params: List[KV]=Nil) = {
-    val allParams = {
-      ("method", method.name) ::
-      ("api_key", Credentials.ApiKey) ::
-      ("format", "json") ::
-      params
-    }
-    val finParams = if (method.signed) this signParams allParams
-                    else allParams
-    Util mkUrl (Rtm.RestBase, finParams)
-  }
+  /*
+
 
   def mkAuthUrl(frob:String) = {
     val allParams = {
@@ -138,10 +82,5 @@ object Http {
     else Left(stat)
   }
 
-  /*private[this]*/ def signParams(params: List[KV]): List[KV] = {
-    val sortedParams = params sortWith { _._1 < _._1 }
-    val concatedParams = sortedParams.foldLeft("")( (acc,str) => acc + str._1 + str._2 )
-    val sig = Util md5 (Credentials.SharedSecret + concatedParams)
-    (Rtm.SigKey, sig) :: params
-  }
+  */
 }

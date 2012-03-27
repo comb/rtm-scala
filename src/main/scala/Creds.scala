@@ -4,6 +4,7 @@ import java.io.File
 
 import scala.io.Source
 
+/* This is strictly for testing on a desktop JVM. */
 object Credentials {
 
   lazy val HomeDir = new File(
