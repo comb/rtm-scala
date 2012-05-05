@@ -5,6 +5,7 @@ package net.combinatory.rtm
 import org.joda.time.format.ISODateTimeFormat
 import Methods.Method
 import net.combinatory.rtm.Responses.Frob
+import net.combinatory.rtm.impl._
 
 object Rtm {
 
@@ -34,39 +35,35 @@ object Rtm {
     body
   }
 
-
   def mkAuthUrl(frob: Frob) = {
     val allParams = {
       "frob" -> frob.frob ::
-        ("perms", "read") ::
-        ("api_key", Credentials.ApiKey) :: Nil
+      "perms" -> "read" ::
+      "api_key" -> Credentials.ApiKey :: Nil
     }
     val finParams = this signParams allParams
-    Util mkUrl(Rtm.AuthBase, finParams)
+    mkUrl(Rtm.AuthBase, finParams)
   }
 
 
   private[this] def mkApiUrl(method: Method, params: List[KV] = Nil) = {
     val allParams = {
-      ("method", method.name) ::
-        ("api_key", Credentials.ApiKey) ::
-        ("format", "json") ::
-        params
+      "method" -> method.name ::
+      "api_key" -> Credentials.ApiKey ::
+      "format" -> "json" ::
+      params
     }
     val finParams = if (method.signed) this signParams allParams
     else allParams
-    Util mkUrl(Rtm.RestBase, finParams)
+    mkUrl(Rtm.RestBase, finParams)
   }
 
   private[this] def signParams(params: List[KV]): List[KV] = {
-    val sortedParams = params sortWith {
-      _._1 < _._1
-    }
+    val sortedParams = params sortWith {_._1 < _._1}
     val concatedParams = sortedParams.foldLeft("") {
-      (acc, str) =>
-        acc + str._1 + str._2
+      (acc, str) => acc + str._1 + str._2
     }
-    val sig = Util md5 (Credentials.SharedSecret + concatedParams)
+    val sig = md5 (Credentials.SharedSecret + concatedParams)
     (Rtm.SigKey, sig) :: params
   }
 }

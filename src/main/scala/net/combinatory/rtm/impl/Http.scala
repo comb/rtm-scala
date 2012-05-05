@@ -10,6 +10,11 @@ import scala.io.Source
 import Methods.Method
 
 
+case class HttpParams(
+  readTimeoutMillis: Int,
+  connectionTimeoutMillis: Int
+  )
+
 class Http(params: HttpParams) {
 
   // private[this] val ConnectionTimeout = 10000

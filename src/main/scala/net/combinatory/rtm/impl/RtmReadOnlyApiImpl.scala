@@ -6,7 +6,6 @@ package impl
 import org.joda.time.DateTime
 
 import Responses.{Auth, Frob, RSP}
-import Requests.ApiToken
 import net.combinatory.rtm.Responses.Auth
 
 

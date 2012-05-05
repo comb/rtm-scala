@@ -1,13 +1,11 @@
 package net.combinatory.rtm
 
-/* (c) rtm-scala contributors, 2012. All rights reserved. */
-
+import java.security.MessageDigest
 import java.math.BigInteger
 import java.net.{URL, URLEncoder}
-import java.security.MessageDigest
 
-object Util {
 
+package object impl {
   def md5(str: String): String = {
     val dig = MessageDigest getInstance "MD5"
     dig update(str.getBytes, 0, str.length)
